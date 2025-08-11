@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome - Payroll App{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <div class="hero-content">
+        <h1>Welcome to Payroll App</h1>
+        <p class="hero-subtitle">Secure and simple time tracking for your payroll needs</p>
+        
+        <div class="hero-actions">
+            <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started</a>
+            <a href="{{ url_for('login') }}" class="btn btn-secondary">Sign In</a>
+        </div>
+    </div>
+</div>
+
+<div class="features">
+    <div class="container">
+        <h2>Features</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3>🔐 Secure Authentication</h3>
+                <p>Your data is protected with industry-standard security measures including encrypted passwords and secure sessions.</p>
+            </div>
+            <div class="feature-card">
+                <h3>⏰ Time Tracking</h3>
+                <p>Easily track your daily hours with our intuitive weekly timesheet interface.</p>
+            </div>
+            <div class="feature-card">
+                <h3>💰 Pay Calculations</h3>
+                <p>Automatic pay calculations for both hourly and salaried employees with weekly summaries.</p>
+            </div>
+            <div class="feature-card">
+                <h3>📊 Dashboard</h3>
+                <p>View your weekly hours and pay totals at a glance with our clean dashboard interface.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

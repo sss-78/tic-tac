@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Timesheet - Payroll App{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Timesheet</h1>
+        <p class="page-subtitle">Enter your daily hours for the selected week</p>
+    </div>
+    
+    <div class="week-selector">
+        <div class="week-navigation">
+            <a href="{{ url_for('timesheet', iso_year=iso_year, iso_week=iso_week-1) if iso_week > 1 else url_for('timesheet', iso_year=iso_year-1, iso_week=52) }}" 
+               class="btn btn-secondary">&larr; Previous Week</a>
+            
+            <div class="current-week">
+                <h3>Week {{ iso_week }}, {{ iso_year }}</h3>
+                <p>{{ timesheet_data[0].date.strftime('%B %d') }} - {{ timesheet_data[6].date.strftime('%B %d, %Y') }}</p>
+            </div>
+            
+            <a href="{{ url_for('timesheet', iso_year=iso_year, iso_week=iso_week+1) if iso_week < 52 else url_for('timesheet', iso_year=iso_year+1, iso_week=1) }}" 
+               class="btn btn-secondary">Next Week &rarr;</a>
+        </div>
+    </div>
+    
+    <div class="timesheet-card">
+        <form method="POST" class="timesheet-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            
+            <div class="timesheet-grid">
+                {% for day_data in timesheet_data %}
+                <div class="day-entry">
+                    <label class="day-label">
+                        <span class="day-name">{{ day_data.day_name }}</span>
+                        <span class="day-date">{{ day_data.date.strftime('%m/%d') }}</span>
+                    </label>
+                    <input type="number" 
+                           name="hours_{{ loop.index0 }}" 
+                           min="0" 
+                           max="24" 
+                           step="0.25" 
+                           value="{{ '%.2f'|format(day_data.hours) if day_data.hours > 0 else '' }}"
+                           placeholder="0.00"
+                           class="hours-input">
+                    <span class="input-suffix">hours</span>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Timesheet</button>
+                <a href="{{ url_for('dashboard', iso_year=iso_year, iso_week=iso_week) }}" class="btn btn-secondary">View Summary</a>
+            </div>
+        </form>
+    </div>
+    
+    <div class="timesheet-help">
+        <h4>Tips:</h4>
+        <ul>
+            <li>Enter hours in decimal format (e.g., 8.5 for 8 hours 30 minutes)</li>
+            <li>You can enter up to 24 hours per day</li>
+            <li>Use increments of 0.25 (15 minutes) for accurate tracking</li>
+            <li>Leave blank or enter 0 for days not worked</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

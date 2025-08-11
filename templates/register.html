@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Payroll App{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>Create Account</h2>
+        <p class="auth-subtitle">Join Payroll App to start tracking your time</p>
+        
+        <form method="POST" class="auth-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required 
+                       value="{{ request.form.email if request.form.email else '' }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required minlength="8">
+                <small class="form-help">Minimum 8 characters</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" required minlength="8">
+            </div>
+            
+            <div class="form-group">
+                <label for="pay_type">Pay Type</label>
+                <select id="pay_type" name="pay_type" required onchange="togglePayFields()">
+                    <option value="">Select pay type...</option>
+                    <option value="hourly" {{ 'selected' if request.form.pay_type == 'hourly' else '' }}>Hourly</option>
+                    <option value="salary" {{ 'selected' if request.form.pay_type == 'salary' else '' }}>Salary</option>
+                </select>
+            </div>
+            
+            <div class="form-group" id="hourly_rate_group" style="display: none;">
+                <label for="hourly_rate">Hourly Rate ($)</label>
+                <input type="number" id="hourly_rate" name="hourly_rate" min="0.01" step="0.01"
+                       value="{{ request.form.hourly_rate if request.form.hourly_rate else '' }}">
+            </div>
+            
+            <div class="form-group" id="annual_salary_group" style="display: none;">
+                <label for="annual_salary">Annual Salary ($)</label>
+                <input type="number" id="annual_salary" name="annual_salary" min="1" step="1"
+                       value="{{ request.form.annual_salary if request.form.annual_salary else '' }}">
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+        </form>
+        
+        <div class="auth-footer">
+            <p>Already have an account? <a href="{{ url_for('login') }}">Sign in here</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePayFields() {
+    const payType = document.getElementById('pay_type').value;
+    const hourlyGroup = document.getElementById('hourly_rate_group');
+    const salaryGroup = document.getElementById('annual_salary_group');
+    const hourlyInput = document.getElementById('hourly_rate');
+    const salaryInput = document.getElementById('annual_salary');
+    
+    if (payType === 'hourly') {
+        hourlyGroup.style.display = 'block';
+        salaryGroup.style.display = 'none';
+        hourlyInput.required = true;
+        salaryInput.required = false;
+        salaryInput.value = '';
+    } else if (payType === 'salary') {
+        hourlyGroup.style.display = 'none';
+        salaryGroup.style.display = 'block';
+        hourlyInput.required = false;
+        salaryInput.required = true;
+        hourlyInput.value = '';
+    } else {
+        hourlyGroup.style.display = 'none';
+        salaryGroup.style.display = 'none';
+        hourlyInput.required = false;
+        salaryInput.required = false;
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    togglePayFields();
+});
+</script>
+{% endblock %}
