@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}{{ error_title }} - Payroll App{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-card">
+        <div class="error-icon">⚠️</div>
+        <h1>{{ error_title }}</h1>
+        <p class="error-message">{{ error_message }}</p>
+        
+        <div class="error-actions">
+            <a href="{{ url_for('index') }}" class="btn btn-primary">Go Home</a>
+            {% if session.user_id %}
+                <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Dashboard</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

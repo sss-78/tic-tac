@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Payroll App{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Dashboard</h1>
+        <p class="page-subtitle">Your weekly time and pay summary</p>
+    </div>
+    
+    <div class="week-selector">
+        <div class="week-navigation">
+            <a href="{{ url_for('dashboard', iso_year=iso_year, iso_week=iso_week-1) if iso_week > 1 else url_for('dashboard', iso_year=iso_year-1, iso_week=52) }}" 
+               class="btn btn-secondary">&larr; Previous Week</a>
+            
+            <div class="current-week">
+                <h3>Week {{ iso_week }}, {{ iso_year }}</h3>
+                <p>{{ week_start.strftime('%B %d') }} - {{ week_end.strftime('%B %d, %Y') }}</p>
+            </div>
+            
+            <a href="{{ url_for('dashboard', iso_year=iso_year, iso_week=iso_week+1) if iso_week < 52 else url_for('dashboard', iso_year=iso_year+1, iso_week=1) }}" 
+               class="btn btn-secondary">Next Week &rarr;</a>
+        </div>
+    </div>
+    
+    <div class="dashboard-grid">
+        <!-- Pay Summary Card -->
+        <div class="summary-card pay-summary">
+            <h3>Pay Summary</h3>
+            <div class="pay-amount">${{ "%.2f"|format(total_pay) }}</div>
+            <div class="pay-details">
+                <p class="pay-type">{{ user.pay_type.title() }} Employee</p>
+                <p class="pay-calculation">{{ pay_description }}</p>
+            </div>
+        </div>
+        
+        <!-- Hours Summary Card -->
+        <div class="summary-card hours-summary">
+            <h3>Hours Summary</h3>
+            <div class="hours-amount">{{ "%.2f"|format(total_hours) }}</div>
+            <div class="hours-details">
+                <p>Total Hours This Week</p>
+                {% if user.pay_type == 'hourly' %}
+                <p class="rate-info">Rate: ${{ "%.2f"|format(user.hourly_rate) }}/hour</p>
+                {% else %}
+                <p class="rate-info">Annual: ${{ "{:,.2f}"|format(user.annual_salary) }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Daily Breakdown -->
+    <div class="daily-breakdown">
+        <h3>Daily Breakdown</h3>
+        <div class="breakdown-table">
+            <div class="table-header">
+                <span>Day</span>
+                <span>Date</span>
+                <span>Hours</span>
+                {% if user.pay_type == 'hourly' %}
+                <span>Daily Pay</span>
+                {% endif %}
+            </div>
+            {% for day in daily_summary %}
+            <div class="table-row {{ 'no-hours' if day.hours == 0 else '' }}">
+                <span class="day-name">{{ day.day_name }}</span>
+                <span class="day-date">{{ day.date.strftime('%m/%d/%Y') }}</span>
+                <span class="day-hours">{{ "%.2f"|format(day.hours) }}</span>
+                {% if user.pay_type == 'hourly' %}
+                <span class="day-pay">${{ "%.2f"|format(day.hours * user.hourly_rate) }}</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+            
+            <!-- Total Row -->
+            <div class="table-row total-row">
+                <span class="day-name"><strong>Total</strong></span>
+                <span class="day-date"></span>
+                <span class="day-hours"><strong>{{ "%.2f"|format(total_hours) }}</strong></span>
+                {% if user.pay_type == 'hourly' %}
+                <span class="day-pay"><strong>${{ "%.2f"|format(total_pay) }}</strong></span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <h3>Quick Actions</h3>
+        <div class="action-buttons">
+            <a href="{{ url_for('timesheet', iso_year=iso_year, iso_week=iso_week) }}" class="btn btn-primary">
+                Edit This Week's Timesheet
+            </a>
+            <a href="{{ url_for('timesheet') }}" class="btn btn-secondary">
+                Go to Current Week
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
